@@ -1,6 +1,15 @@
+import { createRequire } from "module";
+const require = createRequire(import.meta.url);
+
 import { config } from "dotenv";
 import { Client, GatewayIntentBits, Guild, Routes } from "discord.js";
+import { SlashCommandBuilder } from "@discordjs/builders";
 import { REST } from "@discordjs/rest";
+import { commands } from "./commands.js";
+
+const wait = require("node:timers/promises").setTimeout;
+// import { timersPromises } from "timers-promises";
+
 config();
 
 const TOKEN = process.env.BOT_TOKEN;
@@ -26,33 +35,35 @@ client.on("interactionCreate", (interaction) => {
     // console.log(interaction);
 
     switch (interaction.commandName) {
-      case "max":
-        let maxNum = 0;
-        console.log(interaction.options.data);
-        interaction.options.data.forEach((obj) => {
-          const num = Number(obj.value);
-          if (num > maxNum) {
-            maxNum = num;
-          }
-        });
-        interaction.reply(`Max number is ${maxNum}`);
-        break;
-      case "ping":
-        interaction.reply("pong");
-        break;
       case "fanart":
         fetch("https://gi-img-api.ak-team.repl.co/api/genshin/character")
           .then((res) => res.json())
-          .then((res) => {
-            interaction.reply({ content: "Fanart", files: [res.url] });
+          .then(async (res) => {
+            await interaction.deferReply();
+            await wait(4000);
+            await interaction.editReply({
+              content: "Fanart",
+              ephemeral: true,
+              files: [res.url],
+            });
           });
         break;
       case "cosplay":
         fetch("https://gi-img-api.ak-team.repl.co/api/genshin/cosplay")
           .then((res) => res.json())
-          .then((res) => {
-            interaction.reply({ content: "Cosplay", files: [res.url] });
+          .then(async (res) => {
+            await interaction.deferReply();
+            await wait(4000);
+            await interaction.editReply({
+              content: "Cosplay",
+              ephemeral: true,
+              files: [res.url],
+            });
           });
+
+        break;
+      case "order":
+        interaction.reply(`You ordered`);
         break;
       default:
         break;
@@ -61,32 +72,6 @@ client.on("interactionCreate", (interaction) => {
 });
 
 async function main() {
-  const commands = [
-    {
-      name: "ping",
-      description: "ping it!",
-      options: [
-        { name: "food", description: "lalala", type: 3, required: true },
-      ],
-    },
-    {
-      name: "max",
-      description: "finds max number",
-      options: [
-        { name: "num1", description: "first number", type: 3, required: true },
-        { name: "num2", description: "second number", type: 3, required: true },
-        { name: "num3", description: "third number", type: 3, required: true },
-      ],
-    },
-    {
-      name: "fanart",
-      description: "sends a random genshin fanart🎨",
-    },
-    {
-      name: "cosplay",
-      description: "sends a random genshin cosplay👗",
-    },
-  ];
   try {
     await rest.put(Routes.applicationGuildCommands(CLIENT_ID, GUILD_ID), {
       body: commands,
