@@ -62,6 +62,23 @@ client.on("interactionCreate", (interaction) => {
           });
 
         break;
+      case "enka":
+        fetch(
+          `https://enka.network/api/uid/${interaction.options.getString(
+            "uid"
+          )}/`
+        )
+          .then((res) => res.json())
+          .then(async (res) => {
+            await interaction.deferReply();
+            await wait(4000);
+            await interaction.editReply({
+              content: res.playerInfo.nickname + " " + res.playerInfo.signature,
+              ephemeral: true,
+            });
+            console.log(res);
+          });
+        break;
       case "order":
         interaction.reply(`You ordered`);
         break;
