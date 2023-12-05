@@ -7,8 +7,8 @@ import { SlashCommandBuilder } from "@discordjs/builders";
 import { REST } from "@discordjs/rest";
 import { commands } from "./commands.js";
 
+import dataChar from "./data/characters.json" assert { type: "json" };
 const wait = require("node:timers/promises").setTimeout;
-// import { timersPromises } from "timers-promises";
 
 config();
 
@@ -70,13 +70,28 @@ client.on("interactionCreate", (interaction) => {
         )
           .then((res) => res.json())
           .then(async (res) => {
+            // console.log(res.playerInfo.showAvatarInfoList[0].avatarID);
+            // const fileAvatar = `https://enka.network/ui/${
+            //   dataChar[res.playerInfo.showAvatarInfoList[0].avatarID]
+            //     .SideIconName
+            // }.png`;
             await interaction.deferReply();
             await wait(4000);
             await interaction.editReply({
-              content: res.playerInfo.nickname + " " + res.playerInfo.signature,
+              content:
+                res.playerInfo.nickname +
+                " " +
+                res.playerInfo.signature +
+                " " +
+                res.playerInfo.showAvatarInfoList[0].avatarId,
               ephemeral: true,
+              files: [
+                `https://enka.network/ui/${dataChar[
+                  res.playerInfo.showAvatarInfoList[0].avatarId
+                ].SideIconName.replace("_Side", "")}.png`,
+              ],
             });
-            console.log(res);
+            // console.log(res.playerInfo.showAvatarInfoList[0][1]);
           });
         break;
       case "order":
