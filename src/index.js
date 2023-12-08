@@ -1,13 +1,23 @@
 import { createRequire } from "module";
 const require = createRequire(import.meta.url);
-
 import { config } from "dotenv";
-import { Client, GatewayIntentBits, Guild, Routes } from "discord.js";
+import {
+  Client,
+  GatewayIntentBits,
+  Guild,
+  Routes,
+  EmbedBuilder,
+  AttachmentBuilder,
+} from "discord.js";
 import { SlashCommandBuilder } from "@discordjs/builders";
 import { REST } from "@discordjs/rest";
 import { commands } from "./commands.js";
 
 import dataChar from "./data/characters.json" assert { type: "json" };
+const fs = require("fs");
+
+const Jimp = require("jimp");
+
 const wait = require("node:timers/promises").setTimeout;
 
 config();
@@ -70,28 +80,66 @@ client.on("interactionCreate", (interaction) => {
         )
           .then((res) => res.json())
           .then(async (res) => {
-            // console.log(res.playerInfo.showAvatarInfoList[0].avatarID);
-            // const fileAvatar = `https://enka.network/ui/${
-            //   dataChar[res.playerInfo.showAvatarInfoList[0].avatarID]
-            //     .SideIconName
-            // }.png`;
-            await interaction.deferReply();
-            await wait(4000);
-            await interaction.editReply({
-              content:
-                res.playerInfo.nickname +
-                " " +
-                res.playerInfo.signature +
-                " " +
-                res.playerInfo.showAvatarInfoList[0].avatarId,
-              ephemeral: true,
-              files: [
+            const charactersFilesArray = res.playerInfo.showAvatarInfoList.map(
+              (char) =>
                 `https://enka.network/ui/${dataChar[
-                  res.playerInfo.showAvatarInfoList[0].avatarId
-                ].SideIconName.replace("_Side", "")}.png`,
-              ],
-            });
-            // console.log(res.playerInfo.showAvatarInfoList[0][1]);
+                  char.avatarId
+                ].SideIconName.replace("_Side", "")}.png`
+            );
+            const loadImages = Promise.all(
+              charactersFilesArray.map((path) => Jimp.read(path))
+            );
+            let combinedImage = 0;
+            loadImages
+              .then((images) => {
+                combinedImage = new Jimp(
+                  images[0].bitmap.width * images.length,
+                  images[0].bitmap.height
+                );
+                images.forEach((image, index) => {
+                  combinedImage.blit(image, index * image.bitmap.width, 0);
+                });
+
+                return combinedImage.writeAsync("./src/group.png");
+              })
+              .then(async () => {
+                Jimp.read("./src/group.png", async (err, img) => {
+                  if (err) throw err;
+                  img.write("./src/group.png", (error) => {
+                    if (error) {
+                      console.log(error);
+                      return;
+                    }
+                  });
+                });
+                const enkaEmbed = new EmbedBuilder()
+                  .setColor("#094067")
+                  .setTitle(`${res.playerInfo.nickname}'s Genshin profile`)
+                  .setDescription(
+                    `Rank: ${res.playerInfo.level}\nFinished Achievements: ${res.playerInfo.finishAchievementNum}\nAbyss: ${res.playerInfo.towerFloorIndex} floor, ${res.playerInfo.towerLevelIndex} level\n\n**Showed characters:**`
+                  )
+                  .setImage("attachment://group.png")
+                  .setFooter({
+                    text: `${interaction.options.getString("uid")}`,
+                  });
+                //? attachment://src/group.jpg
+                console.log(enkaEmbed);
+                await interaction.deferReply();
+                await wait(5000);
+                await interaction.editReply({
+                  ephemeral: true,
+                  embeds: [enkaEmbed],
+                  files: [
+                    {
+                      attachment: "./src/group.png",
+                      name: "group.png",
+                    },
+                  ],
+                });
+              });
+          })
+          .catch((err) => {
+            console.log(err);
           });
         break;
       case "order":
