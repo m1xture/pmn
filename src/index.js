@@ -13,7 +13,8 @@ import { SlashCommandBuilder } from "@discordjs/builders";
 import { REST } from "@discordjs/rest";
 import { commands } from "./commands.js";
 
-import dataChar from "./data/characters.json" assert { type: "json" };
+// import dataChar from "./data/characters.json" assert { type: "json" };
+let dataChar;
 const fs = require("fs");
 
 const Jimp = require("jimp");
@@ -73,74 +74,102 @@ client.on("interactionCreate", (interaction) => {
 
         break;
       case "enka":
-        fetch(
-          `https://enka.network/api/uid/${interaction.options.getString(
-            "uid"
-          )}/`
-        )
-          .then((res) => res.json())
-          .then(async (res) => {
-            const charactersFilesArray = res.playerInfo.showAvatarInfoList.map(
-              (char) =>
-                `https://enka.network/ui/${dataChar[
-                  char.avatarId
-                ].SideIconName.replace("_Side", "")}.png`
-            );
-            const loadImages = Promise.all(
-              charactersFilesArray.map((path) => Jimp.read(path))
-            );
-            let combinedImage = 0;
-            loadImages
-              .then((images) => {
-                combinedImage = new Jimp(
-                  images[0].bitmap.width * images.length,
-                  images[0].bitmap.height
+        if (
+          interaction.options.getString("uid").length <= 9 &&
+          !isNaN(interaction.options.getString("uid"))
+        ) {
+          fetch(
+            "https://raw.githubusercontent.com/EnkaNetwork/API-docs/master/store/characters.json"
+          )
+            .then((res) => res.json())
+            .then((resp) => {
+              dataChar = resp;
+            });
+          fetch(
+            `https://enka.network/api/uid/${interaction.options.getString(
+              "uid"
+            )}/`
+          )
+            .then((res) => res.json())
+            .then(async (res) => {
+              const charactersFilesArray =
+                res.playerInfo.showAvatarInfoList.map(
+                  (char) =>
+                    `https://enka.network/ui/${dataChar[
+                      char.avatarId
+                    ].SideIconName.replace("_Side", "")}.png`
                 );
-                images.forEach((image, index) => {
-                  combinedImage.blit(image, index * image.bitmap.width, 0);
-                });
+              const loadImages = Promise.all(
+                charactersFilesArray.map((path) => Jimp.read(path))
+              );
+              let combinedImage = 0;
+              loadImages
+                .then((images) => {
+                  combinedImage = new Jimp(
+                    images[0].bitmap.width * images.length,
+                    images[0].bitmap.height
+                  );
+                  images.forEach((image, index) => {
+                    combinedImage.blit(image, index * image.bitmap.width, 0);
+                  });
 
-                return combinedImage.writeAsync("./src/group.png");
-              })
-              .then(async () => {
-                Jimp.read("./src/group.png", async (err, img) => {
-                  if (err) throw err;
-                  img.write("./src/group.png", (error) => {
-                    if (error) {
-                      console.log(error);
-                      return;
-                    }
+                  return combinedImage.writeAsync("./src/group.png");
+                })
+                .then(async () => {
+                  Jimp.read("./src/group.png", async (err, img) => {
+                    if (err) throw err;
+                    img.write("./src/group.png", (error) => {
+                      if (error) {
+                        console.log(error);
+                        return;
+                      }
+                    });
+                  });
+                  const enkaEmbed = new EmbedBuilder()
+                    .setColor("#8bd3dd")
+                    .setTitle(`${res.playerInfo.nickname}'s Genshin profile`)
+                    .setDescription(
+                      `Rank: ${res.playerInfo.level}\nFinished Achievements: ${res.playerInfo.finishAchievementNum}\nAbyss: ${res.playerInfo.towerFloorIndex} floor, ${res.playerInfo.towerLevelIndex} level\n\n**Showed characters:**`
+                    )
+                    .setImage("attachment://group.png")
+                    .setFooter({
+                      text: `${interaction.options.getString("uid")}`,
+                    });
+                  //? attachment://src/group.jpg
+                  // console.log(enkaEmbed);
+                  await interaction.deferReply();
+                  await wait(5000);
+                  await interaction.editReply({
+                    ephemeral: true,
+                    embeds: [enkaEmbed],
+                    files: [
+                      {
+                        attachment: "./src/group.png",
+                        name: "group.png",
+                      },
+                    ],
                   });
                 });
-                const enkaEmbed = new EmbedBuilder()
-                  .setColor("#094067")
-                  .setTitle(`${res.playerInfo.nickname}'s Genshin profile`)
-                  .setDescription(
-                    `Rank: ${res.playerInfo.level}\nFinished Achievements: ${res.playerInfo.finishAchievementNum}\nAbyss: ${res.playerInfo.towerFloorIndex} floor, ${res.playerInfo.towerLevelIndex} level\n\n**Showed characters:**`
-                  )
-                  .setImage("attachment://group.png")
-                  .setFooter({
-                    text: `${interaction.options.getString("uid")}`,
-                  });
-                //? attachment://src/group.jpg
-                console.log(enkaEmbed);
-                await interaction.deferReply();
-                await wait(5000);
-                await interaction.editReply({
-                  ephemeral: true,
-                  embeds: [enkaEmbed],
-                  files: [
-                    {
-                      attachment: "./src/group.png",
-                      name: "group.png",
-                    },
-                  ],
-                });
-              });
-          })
-          .catch((err) => {
-            console.log(err);
-          });
+            })
+            .catch((err) => {
+              console.log(err);
+            });
+        } else {
+          const errorEmbed = new EmbedBuilder()
+            .setTitle("Error <3")
+            .setDescription("Probably, you have typed an invalid UID")
+            .setColor("#e53170")
+            .setTimestamp();
+          async function errorOccured() {
+            await interaction.deferReply();
+            await wait(4000);
+            await interaction.editReply({
+              ephemeral: true,
+              embeds: [errorEmbed],
+            });
+          }
+          errorOccured();
+        }
         break;
       case "order":
         interaction.reply(`You ordered`);
