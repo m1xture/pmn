@@ -158,6 +158,42 @@ client.on("interactionCreate", (interaction) => {
                     });
                   });
 
+                  //?
+
+                  // const url =
+                  //   "https://web-production-32d8.up.railway.app/api/profile";
+
+                  // // Parameters for the fetch request
+                  // const requestOptions = {
+                  //   method: "POST",
+                  //   headers: {
+                  //     "Content-Type": "application/json",
+                  //   },
+                  //   body: JSON.stringify({
+                  //     uid: 750354959,
+                  //     teample: 1,
+                  //   }), // Assuming 757562748 is your UID
+                  // };
+
+                  // // Fetching data
+                  // fetch(url, requestOptions)
+                  //   .then((response) => {
+                  //     if (!response.ok) {
+                  //       throw new Error(
+                  //         `HTTP error! Status: ${response.status}`
+                  //       );
+                  //     }
+                  //     return response.json();
+                  //   })
+                  //   .then((data) => {
+                  //     console.log(data);
+                  //   })
+                  //   .catch((error) => {
+                  //     console.error("Error during fetch:", error);
+                  //   });
+
+                  //?
+
                   const enkaEmbed = new EmbedBuilder()
                     .setColor("#8bd3dd")
                     .setTitle(`${res.playerInfo.nickname}'s Genshin profile`)
