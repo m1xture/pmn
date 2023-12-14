@@ -8,6 +8,7 @@ import {
   Routes,
   EmbedBuilder,
   AttachmentBuilder,
+  Embed,
 } from "discord.js";
 import { SlashCommandBuilder } from "@discordjs/builders";
 import { REST } from "@discordjs/rest";
@@ -50,25 +51,56 @@ client.on("interactionCreate", (interaction) => {
         fetch("https://gi-img-api.ak-team.repl.co/api/genshin/character")
           .then((res) => res.json())
           .then(async (res) => {
+            const fanartEmbed = new EmbedBuilder()
+              .setTitle("Random Genshin fanart")
+              .setImage(res.url)
+              .setColor("#8bd3dd");
             await interaction.deferReply();
             await wait(4000);
             await interaction.editReply({
-              content: "Fanart",
               ephemeral: true,
-              files: [res.url],
+              embeds: [fanartEmbed],
+            });
+          })
+          .catch(async (err) => {
+            const fanErrEmbed = new EmbedBuilder()
+              .setTitle("Strange error occured <3")
+              .setDescription(`API error. Try again\n${err}`)
+              .setColor("#e53170");
+            await interaction.deferReply();
+            await wait(4000);
+            await interaction.editReply({
+              ephemeral: true,
+              embeds: [fanErrEmbed],
             });
           });
+
         break;
       case "cosplay":
         fetch("https://gi-img-api.ak-team.repl.co/api/genshin/cosplay")
           .then((res) => res.json())
           .then(async (res) => {
+            const cosplayEmbed = new EmbedBuilder()
+              .setTitle("Random Genshin cosplay")
+              .setImage(res.url)
+              .setColor("#8bd3dd");
             await interaction.deferReply();
             await wait(4000);
             await interaction.editReply({
-              content: "Cosplay",
               ephemeral: true,
-              files: [res.url],
+              embeds: [cosplayEmbed],
+            });
+          })
+          .catch(async (err) => {
+            const cosErrEmbed = new EmbedBuilder()
+              .setTitle("Strange error occured <3")
+              .setDescription(`API error. Try again\n${err}`)
+              .setColor("#e53170");
+            await interaction.deferReply();
+            await wait(4000);
+            await interaction.editReply({
+              ephemeral: true,
+              embeds: [cosErrEmbed],
             });
           });
 
@@ -125,6 +157,7 @@ client.on("interactionCreate", (interaction) => {
                       }
                     });
                   });
+
                   const enkaEmbed = new EmbedBuilder()
                     .setColor("#8bd3dd")
                     .setTitle(`${res.playerInfo.nickname}'s Genshin profile`)
