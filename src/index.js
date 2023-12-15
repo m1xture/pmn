@@ -240,6 +240,44 @@ client.on("interactionCreate", (interaction) => {
           errorOccured();
         }
         break;
+      case "dungeons":
+        const daysOfWeek = [
+          "Sunday",
+          "Monday",
+          "Tuesday",
+          "Wednesday",
+          "Thursday",
+          "Friday",
+          "Saturday",
+        ];
+        const dungDate = new Date();
+
+        const dungeonEmbed = new EmbedBuilder()
+          .setColor("#8bd3dd")
+          .setTitle(daysOfWeek[dungDate.getDay()])
+          .setDescription("Today`s schedule");
+        interaction.reply({
+          embeds: [dungeonEmbed],
+        });
+        switch (daysOfWeek[dungDate.getDay()]) {
+          case "Sunday":
+            break;
+          case "Monday":
+            break;
+          case "Tuesday":
+            break;
+          case "Wednesday":
+            break;
+          case "Thursday":
+            break;
+          case "Friday":
+            break;
+          case "Saturday":
+            break;
+          default:
+            break;
+        }
+        break;
       case "order":
         interaction.reply(`You ordered`);
         break;

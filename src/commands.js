@@ -37,10 +37,13 @@ const enkaCommand = new SlashCommandBuilder()
   .addStringOption((option) =>
     option.setName("uid").setDescription("your UID").setRequired(true)
   );
-
+const dungeonsCommand = new SlashCommandBuilder()
+  .setName("dungeons")
+  .setDescription("gives todays`s dungeons schedule");
 export const commands = [
   orderCommand.toJSON(),
   fanartCommand.toJSON(),
   cosplayCommand.toJSON(),
   enkaCommand.toJSON(),
+  dungeonsCommand.toJSON(),
 ];
