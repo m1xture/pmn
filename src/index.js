@@ -45,7 +45,7 @@ client.on("interactionCreate", (interaction) => {
     // console.log(interaction.options.getString("food")); //? get = object
     //todo: interaction.reply({ content: interaction.options.getString("food") });
     // console.log(interaction);
-
+    console.log(interaction.getSubcommandName());
     switch (interaction.commandName) {
       case "fanart":
         fetch("https://gi-img-api.ak-team.repl.co/api/genshin/character")

@@ -40,10 +40,45 @@ const enkaCommand = new SlashCommandBuilder()
 const dungeonsCommand = new SlashCommandBuilder()
   .setName("dungeons")
   .setDescription("gives todays`s dungeons schedule");
+
+const banCommand = new SlashCommandBuilder()
+  .setName("ban")
+  .setDescription("Bans a user")
+  .addSubcommandGroup((group) =>
+    group
+      .setName("group_a")
+      .setDescription("group_a")
+      .addSubcommand((subcommand) =>
+        subcommand
+          .setName("temp")
+          .setDescription("temporary bans a user")
+          .addUserOption((option) =>
+            option.setName("user").setDescription("user to be banned")
+          )
+      )
+      .addSubcommand((subcommand) =>
+        subcommand
+          .setName("perma")
+          .setDescription("perm bans a user")
+          .addUserOption((option) =>
+            option.setName("user").setDescription("user to be banned")
+          )
+      )
+  )
+  .addSubcommand((group) =>
+    group
+      .setName("b")
+      .setDescription("group_b")
+      .addSubcommand((subcommand) =>
+        subcommand.setName("soft").setDescription("soft ban")
+      )
+  );
+
 export const commands = [
   orderCommand.toJSON(),
   fanartCommand.toJSON(),
   cosplayCommand.toJSON(),
   enkaCommand.toJSON(),
   dungeonsCommand.toJSON(),
+  banCommand.toJSON(),
 ];
