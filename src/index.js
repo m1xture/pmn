@@ -10,7 +10,11 @@ import {
   AttachmentBuilder,
   Embed,
 } from "discord.js";
-import { SlashCommandBuilder } from "@discordjs/builders";
+import {
+  ActionRowBuilder,
+  SelectMenuBuilder,
+  SlashCommandBuilder,
+} from "@discordjs/builders";
 import { REST } from "@discordjs/rest";
 import { commands } from "./commands.js";
 
@@ -45,7 +49,7 @@ client.on("interactionCreate", (interaction) => {
     // console.log(interaction.options.getString("food")); //? get = object
     //todo: interaction.reply({ content: interaction.options.getString("food") });
     // console.log(interaction);
-    console.log(interaction.getSubcommandName());
+    // console.log(interaction.getSubcommandName());
     switch (interaction.commandName) {
       case "fanart":
         fetch("https://gi-img-api.ak-team.repl.co/api/genshin/character")
@@ -279,12 +283,25 @@ client.on("interactionCreate", (interaction) => {
         }
         break;
       case "order":
-        interaction.reply(`You ordered`);
+        const actionRowComponent = new ActionRowBuilder().setComponents(
+          new SelectMenuBuilder().setCustomId("food_options").setOptions([
+            { label: "Cake", value: "cake" },
+            { label: "Pasta", value: "pasta" },
+            { label: "Sushi", value: "sushi" },
+          ])
+        );
+        interaction.reply({
+          components: [actionRowComponent.toJSON()],
+        });
         break;
       default:
         break;
     }
-  }
+  } else if (interaction.isSelectMenu()) {
+    console.log(interaction);
+
+    interaction.reply({ content: "hwello" });
+  } 
 });
 
 async function main() {
@@ -298,3 +315,8 @@ async function main() {
   }
 }
 main();
+
+
+
+
+//?
