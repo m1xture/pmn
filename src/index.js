@@ -9,9 +9,12 @@ import {
   EmbedBuilder,
   AttachmentBuilder,
   Embed,
+  TextInputBuilder,
+  TextInputStyle,
 } from "discord.js";
 import {
   ActionRowBuilder,
+  ModalBuilder,
   SelectMenuBuilder,
   SlashCommandBuilder,
 } from "@discordjs/builders";
@@ -290,9 +293,66 @@ client.on("interactionCreate", (interaction) => {
             { label: "Sushi", value: "sushi" },
           ])
         );
+        const actionRowDrinks = new ActionRowBuilder().setComponents(
+          new SelectMenuBuilder().setCustomId("drink_options").setOptions([
+            { label: "Cola", value: "cola" },
+            { label: "Fanta", value: "fanta" },
+          ])
+        );
         interaction.reply({
-          components: [actionRowComponent.toJSON()],
+          components: [actionRowComponent.toJSON(), actionRowDrinks.toJSON()],
         });
+        break;
+      case "register":
+        const modal = new ModalBuilder()
+          .setTitle("Register user form")
+          .setCustomId("registerUserModal")
+          .setComponents(
+            new ActionRowBuilder().setComponents(
+              new TextInputBuilder()
+                .setLabel("username")
+                .setCustomId("username")
+                .setStyle(TextInputStyle.Short)
+            ),
+            new ActionRowBuilder().setComponents(
+              new TextInputBuilder()
+                .setLabel("email")
+                .setCustomId("email")
+                .setStyle(TextInputStyle.Short)
+            ),
+            new ActionRowBuilder().setComponents(
+              new TextInputBuilder()
+                .setLabel("comment")
+                .setCustomId("comment")
+                .setStyle(TextInputStyle.Paragraph)
+            )
+          );
+        interaction.showModal(modal);
+        break;
+      case "heads_or_tails":
+        interaction.reply({
+          content: "The coin is dropping...",
+        });
+        const droppedValue = ["Heads", "Tails"][
+          Math.round(Math.random() * 1 - 0)
+        ];
+        // console.log(droppedValue);
+        let emoji = ":full_moon:";
+        if (droppedValue === "Tails") {
+          emoji = ":new_moon:";
+        }
+        interaction.channel.send(`${droppedValue} dropped!${emoji}`);
+        // console.log(interaction.options.getString("your_value"));
+        if (interaction.options.getString("your_value") !== null) {
+          if (
+            interaction.options.getString("your_value").toLowerCase() ===
+            droppedValue.toLowerCase()
+          ) {
+            interaction.channel.send("You won!");
+          } else {
+            interaction.channel.send("You lose! Baka");
+          }
+        }
         break;
       default:
         break;
@@ -301,7 +361,12 @@ client.on("interactionCreate", (interaction) => {
     console.log(interaction);
 
     interaction.reply({ content: "hwello" });
-  } 
+    if (interaction.customId === "food_options") {
+      interaction.delete;
+      interaction.channel.send("lala");
+    } else if (interaction.customId === "drink_options") {
+    }
+  }
 });
 
 async function main() {
@@ -315,8 +380,3 @@ async function main() {
   }
 }
 main();
-
-
-
-
-//?

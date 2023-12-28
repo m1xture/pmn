@@ -3,27 +3,27 @@ import { SlashCommandBuilder } from "@discordjs/builders";
 
 const orderCommand = new SlashCommandBuilder()
   .setName("order")
-  .setDescription("order mthj")
-  // .addStringOption((option) =>
-  //   option
-  //     .setName("food")
-  //     .setDescription("choose a meal")
-  //     .setRequired(true)
-  //     .setChoices(
-  //       { name: "Pizza", value: "pizza" },
-  //       { name: "Delicious soup", value: "soup" }
-  //     )
-  // )
-  // .addStringOption((option) =>
-  //   option
-  //     .setName("drink")
-  //     .setDescription("chooser a drink")
-  //     .setRequired(false)
-  //     .setChoices(
-  //       { name: "fanta", value: "true fanta" },
-  //       { name: "water", value: "true weater" }
-  //     )
-  // );
+  .setDescription("order mthj");
+// .addStringOption((option) =>
+//   option
+//     .setName("food")
+//     .setDescription("choose a meal")
+//     .setRequired(true)
+//     .setChoices(
+//       { name: "Pizza", value: "pizza" },
+//       { name: "Delicious soup", value: "soup" }
+//     )
+// )
+// .addStringOption((option) =>
+//   option
+//     .setName("drink")
+//     .setDescription("chooser a drink")
+//     .setRequired(false)
+//     .setChoices(
+//       { name: "fanta", value: "true fanta" },
+//       { name: "water", value: "true weater" }
+//     )
+// );
 const fanartCommand = new SlashCommandBuilder()
   .setName("fanart")
   .setDescription("sends a random genshin fanart🎨");
@@ -66,13 +66,31 @@ const dungeonsCommand = new SlashCommandBuilder()
 //       )
 //   )
 //  .addSubcommand((group) =>
-  //   group
-  //     .setName("b")
-  //     .setDescription("group_b")
-  //     .addSubcommand((subcommand) =>
-  //       subcommand.setName("soft").setDescription("soft ban")
-  //     )
-  // );
+//   group
+//     .setName("b")
+//     .setDescription("group_b")
+//     .addSubcommand((subcommand) =>
+//       subcommand.setName("soft").setDescription("soft ban")
+//     )
+// );
+
+const registerCommand = new SlashCommandBuilder()
+  .setName("register")
+  .setDescription("Register a user to the serber officially");
+
+const hotCommand = new SlashCommandBuilder()
+  .setName("heads_or_tails")
+  .setDescription("What will drop? Heads or tails??")
+  .addStringOption((option) =>
+    option
+      .setName("your_value")
+      .setDescription("choose your option")
+      .setRequired(false)
+      .setChoices(
+        { name: "Heads", value: "heads" },
+        { name: "Tails", value: "tails" }
+      )
+  );
 
 export const commands = [
   orderCommand.toJSON(),
@@ -81,4 +99,6 @@ export const commands = [
   enkaCommand.toJSON(),
   dungeonsCommand.toJSON(),
   // banCommand.toJSON(),
+  registerCommand.toJSON(),
+  hotCommand.toJSON(),
 ];
