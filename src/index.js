@@ -11,6 +11,7 @@ import {
   Embed,
   TextInputBuilder,
   TextInputStyle,
+  InteractionType,
 } from "discord.js";
 import {
   ActionRowBuilder,
@@ -365,6 +366,12 @@ client.on("interactionCreate", (interaction) => {
       interaction.delete;
       interaction.channel.send("lala");
     } else if (interaction.customId === "drink_options") {
+    }
+  } else if (interaction.type === InteractionType.ModalSubmit) {
+    console.log("modal submitted...");
+    if (interaction.customId === "registerUserModal") {
+      const username = interaction.fields.getTextInputValue("username");
+      interaction.reply({content: ` has successfully submitted the form`})
     }
   }
 });
