@@ -355,6 +355,38 @@ client.on("interactionCreate", (interaction) => {
           }
         }
         break;
+      case "clear":
+        if (isNaN(Number(interaction.options.getString("num"))) && interaction.options.getString("num") !== "all") {
+          return interaction.reply({
+            content: "Enter __a number__ into the first parameter",
+          });
+        }
+        if (!interaction.options.getString("user")) {
+          async function deleteMessages() {
+            await interaction.channel.messages
+              .fetch({
+                limit: Number(interaction.options.getString("num")),
+              })
+              .then(async (msgs) => {
+                interaction.channel.bulkDelete(msgs);
+                interaction.reply({
+                  content: `${interaction.options.getString(
+                    "num"
+                  )} messages deleted. And this message'll delete after 5s.`,
+                });
+                const replyMessage = await interaction.fetchReply();
+                setTimeout(() => replyMessage.delete(), 5000);
+              });
+          }
+          deleteMessages();
+        } else {
+          if (interaction.options.getString("num") === "all") {
+
+            return;
+          }
+          
+        }
+        break;
       default:
         break;
     }
@@ -371,7 +403,7 @@ client.on("interactionCreate", (interaction) => {
     console.log("modal submitted...");
     if (interaction.customId === "registerUserModal") {
       const username = interaction.fields.getTextInputValue("username");
-      interaction.reply({content: ` has successfully submitted the form`})
+      interaction.reply({ content: ` has successfully submitted the form` });
     }
   }
 });

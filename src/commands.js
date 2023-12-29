@@ -92,6 +92,19 @@ const hotCommand = new SlashCommandBuilder()
       )
   );
 
+const clearCommand = new SlashCommandBuilder()
+  .setName("clear")
+  .setDescription("delete some number of messages")
+  .addStringOption((option) =>
+    option.setName("num").setDescription("number of messages").setRequired(true)
+  )
+  .addStringOption((option) =>
+    option
+      .setName("user")
+      .setDescription("select a user whose messages had to be deleted")
+      .setRequired(false)
+  );
+
 export const commands = [
   orderCommand.toJSON(),
   fanartCommand.toJSON(),
@@ -101,4 +114,5 @@ export const commands = [
   // banCommand.toJSON(),
   registerCommand.toJSON(),
   hotCommand.toJSON(),
+  clearCommand.toJSON(),
 ];
