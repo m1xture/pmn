@@ -12,6 +12,7 @@ import {
   TextInputBuilder,
   TextInputStyle,
   InteractionType,
+  PermissionsBitField,
 } from "discord.js";
 import {
   ActionRowBuilder,
@@ -356,35 +357,83 @@ client.on("interactionCreate", (interaction) => {
         }
         break;
       case "clear":
-        if (isNaN(Number(interaction.options.getString("num"))) && interaction.options.getString("num") !== "all") {
-          return interaction.reply({
-            content: "Enter __a number__ into the first parameter",
-          });
-        }
-        if (!interaction.options.getString("user")) {
-          async function deleteMessages() {
-            await interaction.channel.messages
+        console.log();
+
+        if (
+          interaction.member.permissions.has(
+            PermissionsBitField.Flags.ManageMessages
+          )
+        ) {
+          if (
+            isNaN(Number(interaction.options.getString("num"))) &&
+            interaction.options.getString("num") !== "all"
+          ) {
+            return interaction.reply({
+              content: "Enter __a number__ into the first parameter",
+            });
+          }
+          if (Number(interaction.options.getString("num")) >= 100) {
+            return interaction.reply({
+              content: "You can't delete 100 or more messages one time",
+            });
+          }
+          if (!interaction.options.getString("user")) {
+            async function deleteMessages() {
+              await interaction.channel.messages
+                .fetch({
+                  limit: Number(interaction.options.getString("num")),
+                })
+                .then(async (msgs) => {
+                  interaction.channel.bulkDelete(msgs);
+                  interaction.reply({
+                    content: `${interaction.options.getString(
+                      "num"
+                    )} messages deleted. And this message'll delete after 5s.`,
+                  });
+                  const replyMessage = await interaction.fetchReply();
+                  setTimeout(() => replyMessage.delete(), 5000);
+                });
+            }
+            deleteMessages();
+          } else {
+            if (interaction.options.getString("num") === "all") {
+              return;
+            }
+            console.log();
+            const delUserId = interaction.options
+              .getString("user")
+              .slice(2, -1);
+            interaction.channel.messages
               .fetch({
                 limit: Number(interaction.options.getString("num")),
               })
-              .then(async (msgs) => {
-                interaction.channel.bulkDelete(msgs);
-                interaction.reply({
-                  content: `${interaction.options.getString(
-                    "num"
-                  )} messages deleted. And this message'll delete after 5s.`,
-                });
-                const replyMessage = await interaction.fetchReply();
-                setTimeout(() => replyMessage.delete(), 5000);
-              });
+              .then((messages) => {
+                console.log(messages);
+                messages = messages.filter(
+                  (msg) => String(msg.author.id) === String(delUserId)
+                );
+                // .array()
+                console.log(messages);
+                interaction.channel
+                  .bulkDelete(messages)
+                  .then(() => {
+                    interaction.reply({
+                      content: `Successfully deleted ${interaction.options.getString(
+                        "num"
+                      )} messages from ${interaction.options.getString("user")}`,
+                    });
+                  })
+                  .catch((err) => console.log(err));
+              })
+              .catch((err) =>
+                interaction.reply({ content: "Strange error occured" })
+              );
           }
-          deleteMessages();
         } else {
-          if (interaction.options.getString("num") === "all") {
-
-            return;
-          }
-          
+          console.log(interaction);
+          interaction.reply({
+            content: `<@${interaction.user.id}>, you have not enough permissions to use this command`,
+          });
         }
         break;
       default:
