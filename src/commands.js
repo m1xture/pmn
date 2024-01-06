@@ -105,6 +105,10 @@ const clearCommand = new SlashCommandBuilder()
       .setRequired(false)
   );
 
+const buttonCommand = new SlashCommandBuilder()
+  .setName("button")
+  .setDescription("btn");
+
 export const commands = [
   orderCommand.toJSON(),
   fanartCommand.toJSON(),
@@ -115,4 +119,5 @@ export const commands = [
   registerCommand.toJSON(),
   hotCommand.toJSON(),
   clearCommand.toJSON(),
+  buttonCommand.toJSON(),
 ];

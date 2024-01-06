@@ -13,9 +13,11 @@ import {
   TextInputStyle,
   InteractionType,
   PermissionsBitField,
+  ButtonStyle,
 } from "discord.js";
 import {
   ActionRowBuilder,
+  ButtonBuilder,
   ModalBuilder,
   SelectMenuBuilder,
   SlashCommandBuilder,
@@ -45,6 +47,29 @@ const client = new Client({
     GatewayIntentBits.GuildMessages,
     GatewayIntentBits.MessageContent,
   ],
+});
+
+client.on("messageCreate", (msg) => {
+  if (msg.author.bot) return;
+  msg.channel.send({
+    content: "Hello",
+    components: [
+      new ActionRowBuilder().setComponents(
+        new ButtonBuilder()
+          .setCustomId("button1")
+          .setLabel("Buton 1")
+          .setStyle(ButtonStyle.Primary),
+        new ButtonBuilder()
+          .setCustomId("button2")
+          .setLabel("Buton 2")
+          .setStyle(ButtonStyle.Danger),
+        new ButtonBuilder()
+          .setLabel("Buton 3")
+          .setStyle(ButtonStyle.Link)
+          .setURL("https://github.com/m1xture/pmn")
+      ),  
+    ],
+  });
 });
 
 client.on("interactionCreate", (interaction) => {
@@ -420,7 +445,9 @@ client.on("interactionCreate", (interaction) => {
                     interaction.reply({
                       content: `Successfully deleted ${interaction.options.getString(
                         "num"
-                      )} messages from ${interaction.options.getString("user")}`,
+                      )} messages from ${interaction.options.getString(
+                        "user"
+                      )}`,
                     });
                   })
                   .catch((err) => console.log(err));
@@ -435,6 +462,27 @@ client.on("interactionCreate", (interaction) => {
             content: `<@${interaction.user.id}>, you have not enough permissions to use this command`,
           });
         }
+        break;
+      case "button":
+        interaction.reply({
+          content: "Btn",
+          components: [
+            new ActionRowBuilder().setComponents(
+              new ButtonBuilder()
+                .setCustomId("button1")
+                .setLabel("Buton 1")
+                .setStyle(ButtonStyle.Primary),
+              new ButtonBuilder()
+                .setCustomId("button2")
+                .setLabel("Buton 2")
+                .setStyle(ButtonStyle.Danger),
+              new ButtonBuilder()
+                .setLabel("Buton 3")
+                .setStyle(ButtonStyle.Link)
+                .setURL("https://github.com/m1xture/pmn")
+            ),
+          ],
+        });
         break;
       default:
         break;
